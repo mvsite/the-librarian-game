@@ -100,20 +100,26 @@ export class InputManager {
       event.preventDefault();
     }
     
+    // Normalize WASD keys to handle shift key case sensitivity
+    const normalizedKey = this.normalizeMovementKey(event.key);
+    
     // If this key wasn't already down, it's a new press
-    if (!this.keys.has(event.key)) {
-      this.frameKeyPresses.add(event.key);
-      console.log('New key press:', event.key);
+    if (!this.keys.has(normalizedKey)) {
+      this.frameKeyPresses.add(normalizedKey);
+      console.log('New key press:', normalizedKey);
     }
     
-    this.keys.set(event.key, true);
+    this.keys.set(normalizedKey, true);
   }
   
   handleKeyUp(event) {
-    if (this.keys.has(event.key)) {
-      this.frameKeyReleases.add(event.key);
+    // Normalize WASD keys to handle shift key case sensitivity
+    const normalizedKey = this.normalizeMovementKey(event.key);
+    
+    if (this.keys.has(normalizedKey)) {
+      this.frameKeyReleases.add(normalizedKey);
     }
-    this.keys.delete(event.key);
+    this.keys.delete(normalizedKey);
   }
   
   handleMouseDown(event) {
@@ -255,9 +261,19 @@ export class InputManager {
     return { x, y };
   }
   
+  // Normalize WASD keys to handle shift key case sensitivity
+  normalizeMovementKey(key) {
+    // Only normalize WASD keys, leave other keys (like Shift) unchanged
+    const movementKeys = ['w', 'a', 's', 'd', 'W', 'A', 'S', 'D'];
+    if (movementKeys.includes(key)) {
+      return key.toLowerCase();
+    }
+    return key;
+  }
+  
   // Utility methods
   isGameKey(key) {
-    const gameKeys = ['w', 'a', 's', 'd', 'W', 'A', 'S', 'D', 
+    const gameKeys = ['w', 'a', 's', 'd', 'W', 'A', 'S', 'D',
                      'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
                      ' ', 'Shift', 'p', 'P', 'Escape'];
     return gameKeys.includes(key);
